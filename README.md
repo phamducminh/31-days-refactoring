@@ -4,6 +4,7 @@ This will keep reminding me refactoring my silly code
 ## Contents
 
 - [Refactoring Day 1 : Encapsulate Collection](README.md#refactoring-day-1-encapsulate-collection)
+- [Refactoring Day 2 : Move Method](README.md#refactoring-day-2-move-method)
 
 ---
 
@@ -13,7 +14,7 @@ This will keep reminding me refactoring my silly code
 * Only expose the collection as something you can iterate over without modifying the collection
 * Using this can ensure that consumers do not mis-use your collection and introduce bugs into the code
 
-```java
+```C#
 public class Order
 {
     private List<OrderLine> _orderLines;
@@ -40,5 +41,106 @@ public class Order
 }
 ```
 
+## Refactoring Day 2 : Move Method
+
+**Move a method to a better location**
+
+Before refactoring:
+
+```C#
+public class BankAccount
+{
+    public BankAccount(int accountAge, int creditScore,
+                            AccountInterest accountInterest)
+    {
+        AccountAge = accountAge;
+        CreditScore = creditScore;
+        AccountInterest = accountInterest;
+    }
+
+    public double CalculateInterestRate()
+    {
+        if (Account.CreditScore > 800)
+            return 0.02;
+
+        if (Account.AccountAge > 10)
+            return 0.03;
+
+        return 0.05;
+    }
+}
+
+public class AccountInterest
+{
+    public BankAccount Account { get; private set; }
+
+    public AccountInterest(BankAccount account)
+    {
+        Account = account;
+    }
+
+    public double InterestRate
+    {
+        get { return Account.CalculateInterestRate(); }
+    }
+
+    public bool IntroductoryRate
+    {
+        get { return Account.CalculateInterestRate() < 0.05; }
+    }
+}   
+```
+
+After refactoring:
+
+```C#
+public class BankAccount
+{
+    public BankAccount(int accountAge, int creditScore,
+                            AccountInterest accountInterest)
+    {
+        AccountAge = accountAge;
+        CreditScore = creditScore;
+        AccountInterest = accountInterest;
+    }
+
+    public int AccountAge { get; private set; }
+    public int CreditScore { get; private set; }
+    public AccountInterest AccountInterest { get; private set; }
+}
+
+public class AccountInterest
+{
+    public BankAccount Account { get; private set; }
+
+    public AccountInterest(BankAccount account)
+    {
+        Account = account;
+    }
+
+    public double InterestRate
+    {
+        get { return CalculateInterestRate(); }
+    }
+
+    public bool IntroductoryRate
+    {
+        get { return CalculateInterestRate() < 0.05; }
+    }
+
+    public double CalculateInterestRate()
+    {
+        if (Account.CreditScore > 800)
+            return 0.02;
+
+        if (Account.AccountAge > 10)
+            return 0.03;
+
+        return 0.05;
+    }
+}
+```
+
+The point of interest here is the `BankAccount.CalculateInterest` method. A hint that you need the Move Method refactoring is **_when another class is using a method more often then the class in which it lives, then it makes sense to move the method to the class where it is primarily used_**
 
 
