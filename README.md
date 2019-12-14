@@ -3,8 +3,8 @@ This will keep reminding me refactoring my silly code
 
 ## Contents
 
-- [Refactoring Day 1 : Encapsulate Collection](README.md#refactoring-day-1-encapsulate-collection)
-- [Refactoring Day 2 : Move Method](README.md#refactoring-day-2-move-method)
+- [Refactoring Day 1 : Encapsulate Collection](README.md#refactoring-day-1--encapsulate-collection)
+- [Refactoring Day 2 : Move Method](README.md#refactoring-day-2--move-method)
 
 ---
 
