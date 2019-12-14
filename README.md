@@ -5,6 +5,7 @@ This will keep reminding me refactoring my silly code
 
 - [Refactoring Day 1 : Encapsulate Collection](README.md#refactoring-day-1--encapsulate-collection)
 - [Refactoring Day 2 : Move Method](README.md#refactoring-day-2--move-method)
+- [Refactoring Day 3 : Pull Up Method](README.md#refactoring-day-3--pull-up-method)
 
 ---
 
@@ -143,4 +144,65 @@ public class AccountInterest
 
 The point of interest here is the `BankAccount.CalculateInterest` method. A hint that you need the Move Method refactoring is **_when another class is using a method more often then the class in which it lives, then it makes sense to move the method to the class where it is primarily used_**
 
+## Refactoring Day 3 : Pull Up Method
+
+The Pull Up Method refactoring is the process of **taking a method and “Pulling” it up in the inheritance chain**. This is used when a method needs to be used by multiple implementers.
+
+Before refactoring:
+
+```C#
+public abstract class Vehicle
+{
+    // other methods
+}
+
+public class Car : Vehicle
+{
+    public void Turn(Direction direction)
+    {
+        // code here
+    }
+}
+
+public class Motorcycle : Vehicle
+{
+}
+
+public enum Direction
+{
+    Left,
+    Right
+}
+```
+
+After refactoring:
+
+```C#
+public abstract class Vehicle
+{
+    public void Turn(Direction direction)
+    {
+        // code here
+    }
+
+
+public class Car : Vehicle
+{
+}
+
+public class Motorcycle : Vehicle
+{
+}
+
+public enum Direction
+{
+    Left,
+    Right
+}
+```
+
+Some notes:
+
+* The only drawback is we have increased surface area of the base class adding to it’s complexity so use wisely. Only place methods that need to be used by more that one derived class.
+* Once you start overusing inheritance it breaks down pretty quickly and you should start to lean towards composition over inheritance.s
 
