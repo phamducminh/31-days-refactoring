@@ -6,6 +6,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 1 : Encapsulate Collection](README.md#refactoring-day-1--encapsulate-collection)
 - [Refactoring Day 2 : Move Method](README.md#refactoring-day-2--move-method)
 - [Refactoring Day 3 : Pull Up Method](README.md#refactoring-day-3--pull-up-method)
+- [Refactoring Day 4 : Push Down Method](README.md#refactoring-day-4--push-down-method)
 
 ---
 
@@ -204,5 +205,51 @@ public enum Direction
 Some notes:
 
 * The only drawback is we have increased surface area of the base class adding to it’s complexity so use wisely. Only place methods that need to be used by more that one derived class.
-* Once you start overusing inheritance it breaks down pretty quickly and you should start to lean towards composition over inheritance.s
+* Once you start overusing inheritance it breaks down pretty quickly and you should start to lean towards composition over inheritance.
+
+## Refactoring Day 4 : Push Down Method
+
+Before refactoring:
+
+```C#
+public abstract class Animal
+{
+    public void Bark()
+    {
+        // code to bark
+    }
+}
+
+public class Dog : Animal
+{
+}
+
+public class Cat : Animal
+{
+}
+```
+
+Perhaps at one time our cat could bark, but now we no longer need that functionality on the Cat class. So we **“Push Down”** the Bark method into the Dog class as it is no longer needed on the base class but perhaps it is still needed when dealing explicitly with a Dog
+
+After refactoring:
+
+```C#
+public abstract class Animal
+{
+}
+
+public class Dog : Animal
+{
+    public void Bark()
+    {
+        // code to bark
+    }
+}
+
+public class Cat : Animal
+{
+}
+```
+
+_If there is not any behavior still located on the Animal base class, we cab turn the Animal abstract class into an interface instead as no code is required on the contract and can be treated as a marker interface._
 
