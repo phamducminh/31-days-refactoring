@@ -9,6 +9,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 4 : Push Down Method](README.md#refactoring-day-4--push-down-method)
 - [Refactoring Day 5 : Pull Up Field](README.md#refactoring-day-5--pull-up-field)
 - [Refactoring Day 6 : Push Down Field](README.md#refactoring-day-6--push-down-field)
+- [Refactoring Day 7 : Rename (method, class, parameter)](README.md#refactoring-day-7--rename-method-class-parameter)
 
 ---
 
@@ -329,6 +330,46 @@ public class FeatureTask : Task
 ```
 
 We have a string field that is only used by one derived class, and thus can be pushed down as no other classes are using it.
+
+## Refactoring Day 7 : Rename (method, class, parameter)
+
+All too often we do not name methods/classes/parameters properly that leads to a misunderstanding as to what the method/class/parameter’s function is. When this occurs, assumptions are made and bugs are introduced to the system
+
+Before refactoring:
+
+```C#
+public class Person
+{
+    public string FN { get; set; }
+   
+    public decimal ClcHrlyPR()
+    {
+        // code to calculate hourly payrate
+        return 0m;
+    }
+}
+```
+
+As you can see here, we have a class/method/parameter that all have very non-descriptive, obscure names. They can be interpreted in a number of different ways.
+
+Applying this refactoring is as simple as renaming the items at hand to be more descriptive and convey what exactly they do.
+
+After refactoring:
+
+```C#
+// Changed the class name to Employee
+public class Employee
+{
+    public string FirstName { get; set; }
+   
+    public decimal CalculateHourlyPay()
+    {
+        // code to calculate hourly payrate
+        return 0m;
+    }
+}
+```
+
 
 
 
