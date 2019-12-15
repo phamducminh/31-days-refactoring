@@ -7,6 +7,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 2 : Move Method](README.md#refactoring-day-2--move-method)
 - [Refactoring Day 3 : Pull Up Method](README.md#refactoring-day-3--pull-up-method)
 - [Refactoring Day 4 : Push Down Method](README.md#refactoring-day-4--push-down-method)
+- [Refactoring Day 5 : Pull Up Field](README.md#refactoring-day-5--pull-up-field)
 
 ---
 
@@ -252,4 +253,41 @@ public class Cat : Animal
 ```
 
 _If there is not any behavior still located on the Animal base class, we cab turn the Animal abstract class into an interface instead as no code is required on the contract and can be treated as a marker interface._
+
+## Refactoring Day 5 : Pull Up Field
+
+Before refactoring:
+
+```C#
+public abstract class Account
+{
+}
+   
+public class CheckingAccount : Account
+{
+    private decimal _minimumCheckingBalance = 5m;
+}
+
+public class SavingsAccount : Account
+{
+    private decimal _minimumSavingsBalance = 5m;
+}
+```
+
+After refactoring:
+
+```C#
+public abstract class Account
+{
+    protected decimal _minimumBalance = 5m;
+}
+
+public class CheckingAccount : Account
+{
+}
+
+public class SavingsAccount : Account
+{
+}
+```
 
