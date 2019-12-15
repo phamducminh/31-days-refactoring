@@ -8,6 +8,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 3 : Pull Up Method](README.md#refactoring-day-3--pull-up-method)
 - [Refactoring Day 4 : Push Down Method](README.md#refactoring-day-4--push-down-method)
 - [Refactoring Day 5 : Pull Up Field](README.md#refactoring-day-5--pull-up-field)
+- [Refactoring Day 6 : Push Down Field](README.md#refactoring-day-6--push-down-field)
 
 ---
 
@@ -290,4 +291,44 @@ public class SavingsAccount : Account
 {
 }
 ```
+
+## Refactoring Day 6 : Push Down Field
+
+Before refactoring:
+
+```C#
+public abstract class Task
+    {
+    protected string _resolution;
+}
+
+public class BugTask : Task
+{
+}
+
+public class FeatureTask : Task
+{
+}
+```
+
+After refactoring:
+
+```C#
+public abstract class Task
+{
+}
+
+public class BugTask : Task
+{
+    private string _resolution;
+}
+
+public class FeatureTask : Task
+{
+}
+```
+
+We have a string field that is only used by one derived class, and thus can be pushed down as no other classes are using it.
+
+
 
