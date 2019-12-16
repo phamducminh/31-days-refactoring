@@ -10,6 +10,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 5 : Pull Up Field](README.md#refactoring-day-5--pull-up-field)
 - [Refactoring Day 6 : Push Down Field](README.md#refactoring-day-6--push-down-field)
 - [Refactoring Day 7 : Rename (method, class, parameter)](README.md#refactoring-day-7--rename-method-class-parameter)
+- [Refactoring Day 8 : Replace Inheritance with Delegation](README.md#refactoring-day-8--replace-inheritance-with-delegation)
 
 ---
 
@@ -366,6 +367,54 @@ public class Employee
     {
         // code to calculate hourly payrate
         return 0m;
+    }
+}
+```
+
+## Refactoring Day 8 : Replace Inheritance with Delegation
+
+* Inheritance should only be used in logical circumstances but it is often used for convenience purposes.
+* Inheritance should ONLY be used for scenarios where inheritance is warranted. Not instances where it makes it quicker to throw down code.
+
+Before refactoring:
+
+```C#
+public class Sanitation
+{
+    public string WashHands()
+    {
+        return "Cleaned!";
+    }
+}
+
+public class Child : Sanitation
+{
+}
+```
+
+After refactoring:
+
+```C#
+public class Sanitation
+{
+    public string WashHands()
+    {
+        return "Cleaned!";
+    }
+}
+
+public class Child
+{
+    private Sanitation Sanitation { get; set; }
+  
+    public Child()
+    {
+        Sanitation = new Sanitation();
+    }
+
+    public string WashHands()
+    {
+        return Sanitation.WashHands();
     }
 }
 ```
