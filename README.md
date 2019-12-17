@@ -11,6 +11,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 6 : Push Down Field](README.md#refactoring-day-6--push-down-field)
 - [Refactoring Day 7 : Rename (method, class, parameter)](README.md#refactoring-day-7--rename-method-class-parameter)
 - [Refactoring Day 8 : Replace Inheritance with Delegation](README.md#refactoring-day-8--replace-inheritance-with-delegation)
+- [Refactoring Day 9 : Extract Interface](README.md#refactoring-day-9--extract-interface)
 
 ---
 
@@ -418,6 +419,75 @@ public class Child
     }
 }
 ```
+
+## Refactoring Day 9 : Extract Interfaces
+
+Before refactoring:
+
+> When you notice more than one class using a similar subset of methods on a class, it is useful to break the dependency and introduce an interface that the consumers to use.
+
+```C#
+public class ClassRegistration
+{
+    public void Create()
+    {
+        // create registration code
+    }
+   
+    public void Transfer()
+    {
+        // class transfer code
+    }
+
+    public decimal TotalTotal { get; private set; }
+}
+
+public class RegistrationProcessor
+{
+    public decimal ProcessRegistration(ClassRegistration registration)
+    {
+        registration.Create();
+        return registration.Total;
+    }
+}
+```
+
+After refactring:
+
+> Extracted the methods that both consumers use and placed them in an interface. Now the consumers don’t care/know about the class that is implementing these methods. We have decoupled our consumer from the actual implementation and depend only on the contract that we have created.
+
+```C#
+public interface IClassRegistration
+{
+    void Create();
+    decimal Total { get; }
+}
+
+public class ClassRegistration : IClassRegistration
+{
+    public void Create()
+    {
+        // create registration code
+    }
+
+    public void Transfer()
+    {
+        // class transfer code
+    }
+
+    public decimal Total { get; private set; }
+}
+
+public class RegistrationProcessor
+{
+    public decimal ProcessRegistration(IClassRegistration registration)
+    {
+        registration.Create();
+        return registration.Total;
+    }
+}
+```
+
 
 
 
