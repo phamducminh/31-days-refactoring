@@ -12,6 +12,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 7 : Rename (method, class, parameter)](README.md#refactoring-day-7--rename-method-class-parameter)
 - [Refactoring Day 8 : Replace Inheritance with Delegation](README.md#refactoring-day-8--replace-inheritance-with-delegation)
 - [Refactoring Day 9 : Extract Interface](README.md#refactoring-day-9--extract-interface)
+- [Refactoring Day 10 : Extract Method](README.md#rsefactoring-day-10--extract-method)
 
 ---
 
@@ -488,7 +489,91 @@ public class RegistrationProcessor
 }
 ```
 
+## Refactoring Day 10 : Extract Method
 
+> Make code more readable by placing logic behind descriptive method names.
 
+Before refactoring:
+
+```C#
+public class Receipt
+{
+    private IList<decimal> Discounts { get; set; }
+    private IList<decimal> ItemTotals { get; set; }
+   
+    public decimal CalculateGrandTotal()
+    {
+        decimal subTotal = 0m;
+        foreach (decimal itemTotal in ItemTotals)
+            subTotal += itemTotal;
+
+        if (Discounts.Count > 0)
+        {
+            foreach (decimal discount in Discounts)
+                subTotal -= discount;
+        }
+
+        decimal tax = subTotal * 0.065m;
+  
+        subTotal += tax;
+  
+        return subTotal;
+    }
+}
+```
+
+After refactoring:
+
+The `CalculateGrandTotal` method is actually doing three different things here:
+
+* Calculating the subtotal
+* Applying any discounts
+* Calculating the tax for the receipt
+
+```C#
+public class Receipt
+{
+    private IList<decimal> Discounts { get; set; }
+    private IList<decimal> ItemTotals { get; set; }
+
+    public decimal CalculateGrandTotal()
+    {
+        decimal subTotal = CalculateSubTotal();
+        
+        subTotal = CalculateDiscounts(subTotal);
+        
+        subTotal = CalculateTax(subTotal);
+        
+        return subTotal;
+    }
+
+    private decimal CalculateTax(decimal subTotal)
+    {
+        decimal tax = subTotal * 0.065m;
+    
+        subTotal += tax;
+    
+        return subTotal;
+    }
+    
+    private decimal CalculateDiscounts(decimal subTotal)
+    {
+        if (Discounts.Count > 0)
+        {
+            foreach (decimal discount in Discounts)
+                subTotal -= discount;
+        }
+        return subTotal;
+    }
+
+    private decimal CalculateSubTotal()
+    {
+        decimal subTotal = 0m;
+        foreach (decimal itemTotal in ItemTotals)
+            subTotal += itemTotal;
+        return subTotal;
+    }
+}
+``` 
 
 
