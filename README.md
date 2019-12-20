@@ -13,6 +13,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 8 : Replace Inheritance with Delegation](README.md#refactoring-day-8--replace-inheritance-with-delegation)
 - [Refactoring Day 9 : Extract Interface](README.md#refactoring-day-9--extract-interface)
 - [Refactoring Day 10 : Extract Method](README.md#rsefactoring-day-10--extract-method)
+- [Refactoring Day 11 : Switch to Strategy](README.md#refactoring-day-11--switch-to-strategy)
 
 ---
 
@@ -574,6 +575,233 @@ public class Receipt
         return subTotal;
     }
 }
-``` 
+```
+
+## Refactoring Day 11 : Switch to Strategy
+
+This refactoring is used when you have a larger switch statement that continually changes because of new conditions being added. In these cases it’s often better to introduce the strategy pattern and encapsulate each condition in it’s own class.
+
+Before refactoring:
+
+```C#
+namespace LosTechies.DaysOfRefactoring.SwitchToStrategy.Before
+{
+    public class ClientCode
+    {
+        public decimal CalculateShipping()
+        {
+            ShippingInfo shippingInfo = new ShippingInfo();
+            return shippingInfo.CalculateShippingAmount(State.Alaska);
+        }
+    }
+    
+    public enum State
+    {
+        Alaska,
+        NewYork,
+        Florida
+    }
+
+    public class ShippingInfo
+    {
+        public decimal CalculateShippingAmount(State shipToState)
+        {
+            switch(shipToState)
+            {
+                case State.Alaska:
+                    return GetAlaskaShippingAmount();
+                case State.NewYork:
+                    return GetNewYorkShippingAmount();
+                case State.Florida:
+                    return GetFloridaShippingAmount();
+                default:
+                    return 0m;
+            }
+        }
+
+        private decimal GetAlaskaShippingAmount()
+        {
+            return 15m;
+        }
+
+        private decimal GetNewYorkShippingAmount()
+        {
+            return 10m;
+        }
+
+        private decimal GetFloridaShippingAmount()
+        {
+            return 3m;
+        }
+    }
+}
+```
+
+After refactoring:
+
+### Approach 1
+
+Passing the enum as the dictionary key, we can select the proper implementation and execute the code at hand.
+
+In the future when you want to add another condition, add another implementation and add the implementation to the ShippingCalculations dictionary.
+
+```C#
+using System.Collections.Generic;
+
+namespace LosTechies.DaysOfRefactoring.SwitchToStrategy.After
+{
+    public class ClientCode
+    {
+        public decimal CalculateShipping()
+        {
+            ShippingInfo shippingInfo = new ShippingInfo();
+            return shippingInfo.CalculateShippingAmount(State.Alaska);
+        }
+    }
+
+    public enum State
+    {
+        Alaska,
+        NewYork,
+        Florida
+    }
+
+    public class ShippingInfo
+    {
+        private IDictionary<State, IShippingCalculation> ShippingCalculations { get; set; }
+        
+        public ShippingInfo()
+        {
+            ShippingCalculations = new Dictionary<State, IShippingCalculation>
+            {
+                { State.Alaska, new AlaskShippingCalculation() },
+                { State.NewYork, new NewYorkShippingCalculation() },
+                { State.Florida, new FloridaShippingCalculation() }
+            }; 
+        }
+
+        public decimal CalculateShippingAmount(State shipToState)
+        {
+            return ShippingCalculations[shipToState].Calculate();
+        }
+    }
+
+    public interface IShippingCalculation
+    {
+        decimal Calculate();
+    }
+    
+    public class AlaskShippingCalculation : IShippingCalculation
+    {
+        public decimal Calculate()
+        {
+            return 15m;
+        }
+    }
+
+    public class NewYorkShippingCalculation : IShippingCalculation
+    {
+        public decimal Calculate()
+        {
+            return 10m;
+        }
+    }
+
+    public class FloridaShippingCalculation : IShippingCalculation
+    {
+        public decimal Calculate()
+        {
+            return 3m;
+        }
+    }
+}
+```
+
+### Approach 2
+
+The enum for the state now lives in the strategy and ninject gives us a IEnumerable of all bindings to the constructor of IShippingInfo. 
+
+We then create a dictionary using the state property on the strategy to populate our dictionary and the rest is the same.
+
+```C#
+public interface IShippingInfo
+{
+    decimal CalculateShippingAmount(State state);
+}
+
+public class ClientCode
+{
+    [Inject]
+    public IShippingInfo ShippingInfo { get; set; }
+
+    public decimal CalculateShipping()
+    {
+        return ShippingInfo.CalculateShippingAmount(State.Alaska);
+    }
+}
+
+    public enum State
+    {
+        Alaska,
+        NewYork,
+        Florida
+    }
+  
+    public class ShippingInfo : IShippingInfo
+    {
+        private IDictionary<State, IShippingCalculation> ShippingCalculations { get; set; }
+
+        public ShippingInfo(IEnumerable<IShippingCalculation> shippingCalculations)
+        {
+            ShippingCalculations = shippingCalculations.ToDictionary(
+                                          calc => calc.State);
+        }
+
+        public decimal CalculateShippingAmount(State shipToState)
+        {
+            return ShippingCalculations[shipToState].Calculate();
+        }
+    }
+
+    public interface IShippingCalculation
+    {
+        State State { get; }
+        decimal Calculate();
+    }
+
+    public class AlaskShippingCalculation : IShippingCalculation
+    {
+        public State State { get { return State.Alaska; } }
+
+        public decimal Calculate()
+        {
+            return 15m;
+        }
+    }
+
+    public class NewYorkShippingCalculation : IShippingCalculation
+    {
+        public State State { get { return State.NewYork; } }
+
+        public decimal Calculate()
+        {
+            return 10m;
+        }
+    }
+
+    public class FloridaShippingCalculation : IShippingCalculation
+    {
+        public State State { get { return State.Florida; } }
+
+        public decimal Calculate()
+        {
+            return 3m;
+        }
+    }
+```
+
+
+
+
 
 
