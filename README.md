@@ -16,6 +16,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 11 : Switch to Strategy](README.md#refactoring-day-11--switch-to-strategy)
 - [Refactoring Day 12 : Break Dependencies](README.md#refactoring-day-12--break-dependencies)
 - [Refactoring Day 13 : Extract Method Object](README.md#refactoring-day-13--extract-method-object)
+- [Refactoring Day 14 : Break Responsibilities](README.md#refactoring-day-14--break-responsibilities)
 
 ---
 
@@ -990,6 +991,62 @@ public class OrderCalculator
     {
         // Calculate Tax
         SubTotal += SubTotal * Tax;
+    }
+}
+```
+
+## Refactoring Day 14 : Break Responsibilities
+
+Before refactoring:
+
+```C#
+public class Video
+{
+    public void PayFee(decimal fee)
+    {
+    }
+   
+    public void RentVideo(Video video, Customer customer)
+    {
+        customer.Videos.Add(video);
+    }
+  
+    public decimal CalculateBalance(Customer customer)
+    {
+        return customer.LateFees.Sum();
+    }
+}
+
+public class Customer
+{
+    public IList<decimal> LateFees { get; set; }
+    public IList<Video> Videos { get; set; }
+}
+```
+
+As you can see here, the Video class has two responsibilities, once for handling video rentals, and another for managing how many rentals a customer has. We can break out the customer logic into it’s own class to help seperate the responsibilities.
+
+```C#
+public class Video
+{
+    public void RentVideo(Video video, Customer customer)
+    {
+        customer.Videos.Add(video);
+    
+}
+
+public class Customer
+{
+    public IList<decimal> LateFees { get; set; }
+    public IList<Video> Videos { get; set; }
+
+    public void PayFee(decimal fee)
+    {
+    }
+
+    public decimal CalculateBalance(Customer customer)
+    {
+        return customer.LateFees.Sum();
     }
 }
 ```
