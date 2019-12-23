@@ -17,6 +17,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 12 : Break Dependencies](README.md#refactoring-day-12--break-dependencies)
 - [Refactoring Day 13 : Extract Method Object](README.md#refactoring-day-13--extract-method-object)
 - [Refactoring Day 14 : Break Responsibilities](README.md#refactoring-day-14--break-responsibilities)
+- [Refactoring Day 15 : Remove Duplication](README.md#refactoring-day-15--remove-duplication)
 
 ---
 
@@ -1047,6 +1048,57 @@ public class Customer
     public decimal CalculateBalance(Customer customer)
     {
         return customer.LateFees.Sum();
+    }
+}
+```
+
+## Refactoring Day 15 : Remove Duplication
+
+* This is probably one of the most used refactoring in the forms of methods that are used in more than one place
+* It is often added to the codebase through laziness or a developer that is trying to produce as much code as possible, as quickly as possible
+
+```C#
+public class MedicalRecord
+{
+    public DateTime DateArchived { get; private set; }
+    public bool Archived { get; private set; }
+
+    public void ArchiveRecord()
+    {
+        Archived = true;
+        DateArchived = DateTime.Now;
+    }
+
+    public void CloseRecord()
+    {
+        Archived = true;
+        DateArchived = DateTime.Now;
+    }
+}
+```
+
+We move the duplicated code to a shared method and voila! No more duplication. Please enforce this refactoring whenever possible. It leads to much fewer bugs because you aren’t copy/pasting the bugs throughout the code.
+
+```C#
+public class MedicalRecord
+{
+    public DateTime DateArchived { get; private set; }
+    public bool Archived { get; private set; }
+
+    public void ArchiveRecord()
+    {
+        SwitchToArchived();
+    }
+
+    public void CloseRecord()
+    {
+        SwitchToArchived();
+    }
+
+    private void SwitchToArchived()
+    {
+        Archived = true;
+        DateArchived = DateTime.Now;s
     }
 }
 ```
