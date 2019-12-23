@@ -15,6 +15,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 10 : Extract Method](README.md#rsefactoring-day-10--extract-method)
 - [Refactoring Day 11 : Switch to Strategy](README.md#refactoring-day-11--switch-to-strategy)
 - [Refactoring Day 12 : Break Dependencies](README.md#refactoring-day-12--break-dependencies)
+- [Refactoring Day 13 : Extract Method Object](README.md#refactoring-day-13--extract-method-object)
 
 ---
 
@@ -882,6 +883,116 @@ public static class Feeder
 ```
 
 We can now mock IFeederService during our unit test via the AnimalFeedingService constructor by passing in a mock of IFeederService. Later we can move the code in the static into FeederService and delete the static class completely once we have some tests in place.
+
+## Refactoring Day 13 : Extract Method Object
+
+Before refactoring:
+
+```C#
+public class OrderLineItem
+{
+    public decimal Price { get; private set; }
+}
+
+public class Order
+{
+    private IList<OrderLineItem> OrderLineItems { get; set; }
+    private IList<decimal> Discounts { get; set; }
+    private decimal Tax { get; set; }
+
+    public decimal Calculate()
+    {
+        decimal subTotal = 0m;
+
+        // Total up line items
+        foreach (OrderLineItem lineItem in OrderLineItems)
+        {
+            subTotal += lineItem.Price;
+        }
+
+        // Subtract Discounts
+        foreach (decimal discount in Discounts)
+            subTotal -= discount;
+
+        // Calculate Tax
+        decimal tax = subTotal * Tax;
+
+        // Calculate GrandTotal
+        decimal grandTotal = subTotal + tax;
+
+        return grandTotal;
+    }
+}
+```
+
+This entails passing a reference to the class that will be returning the computation to a new object that has the multiple methods via the constructor
+
+After refactoring:
+
+```C#
+public class OrderLineItem
+{
+    public decimal Price { get; private set;}
+}
+    
+public class Order
+{
+    public IEnumerable<OrderLineItem> OrderLineItems { get; private set;}
+    public IEnumerable<decimal> Discounts { get; private set; }
+    public decimal Tax { get; private set; }
+  
+    public decimal Calculate()
+    {
+        return new OrderCalculator(this).Calculate();
+    }
+}
+
+public class OrderCalculator
+{
+    private decimal SubTotal { get; set;}
+    private IEnumerable<OrderLineItem> OrderLineItems { get; set; }
+    private IEnumerable<decimal> Discounts { get; set; }
+    private decimal Tax { get; set; }
+
+    public OrderCalculator(Order order)
+    {
+        OrderLineItems = order.OrderLineItems;
+        Discounts = order.Discounts;
+        Tax = order.Tax;
+    }
+
+    public decimal Calculate()
+    {
+        CalculateSubTotal();
+
+        SubtractDiscounts();
+
+        CalculateTax();
+
+        return SubTotal;
+    }
+
+    private void CalculateSubTotal()
+    {
+        // Total up line items
+        foreach (OrderLineItem lineItem in OrderLineItems)
+            SubTotal += lineItem.Price;
+    }
+
+    private void SubtractDiscounts()
+    {
+        // Subtract Discounts
+        foreach (decimal discount in Discounts)
+            SubTotal -= discount;
+    }
+
+    private void CalculateTax()
+    {
+        // Calculate Tax
+        SubTotal += SubTotal * Tax;
+    }
+}
+```
 
 
 
