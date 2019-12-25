@@ -21,6 +21,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 16 : Encapsulate Conditional](README.md#refactoring-day-16--encapsulate-conditional)
 - [Refactoring Day 17 : Extract Superclass](README.md#refactoring-day-17--extract-superclass)
 - [Refactoring Day 18 : Replace exception with conditional](README.md#refactoring-day-18--replace-exception-with-conditional)
+- [Refactoring Day 19 : Extract Factory Class](README.md#refactoring-day-19--extract-factory-class)
 
 ---
 
@@ -1240,6 +1241,59 @@ public class Microwave
     }
 }
 ```
+
+## Refactoring Day 19 : Extract Factory Class
+
+```C#
+public class PoliceCarController
+{
+    public PoliceCar New(int mileage, bool serviceRequired)
+    {
+        PoliceCar policeCar = new PoliceCar();
+        policeCar.ServiceRequired = serviceRequired;
+        policeCar.mileage = mileage;
+
+        return policeCar;
+    }
+}
+```
+
+As we can see, the new action is responsible for creating a PoliceCar and then setting some initial properties on the police car depending on some external input. This works fine for simple setup, but over time this can grow and the burden of creating the police car is put on the controller which isn’t really something that the controller should be tasked with. In this instance we can extract our creation code and place in a Factory class that has the distinct responsibility of create instances of PoliceCar’s
+
+```C#
+public interface IPoliceCarFactory
+{
+    PoliceCar Create(int mileage, bool serviceRequired);
+}
+
+public class PoliceCarFactory : IPoliceCarFactory
+{
+    public PoliceCar Create(int mileage, bool serviceRequired)
+    {
+        PoliceCar policeCar = new PoliceCar();
+        policeCar.ServiceRequired = serviceRequired;
+        policeCar.Mileage = mileage;
+        return policeCar;
+    }
+}
+
+public class PoliceCarController
+{
+    public IPoliceCarFactory PoliceCarFactory { get; set; }
+
+    public PoliceCarController(IPoliceCarFactory policeCarFactory)
+    {
+        PoliceCarFactory = policeCarFactory;
+    }
+
+    public PoliceCar New(int mileage, bool serviceRequired)
+    {
+        return PoliceCarFactory.Create(mileage, serviceRequired);
+    }
+}
+```
+
+Now that we have the creation logic put off to a factory, we can add to that one class that is tasked with creating instances for us without the worry of missing something during setup or duplicating code.
 
 
 
