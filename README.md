@@ -19,6 +19,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 14 : Break Responsibilities](README.md#refactoring-day-14--break-responsibilities)
 - [Refactoring Day 15 : Remove Duplication](README.md#refactoring-day-15--remove-duplication)
 - [Refactoring Day 16 : Encapsulate Conditional](README.md#refactoring-day-16--encapsulate-conditional)
+- [Refactoring Day 17 : Extract Superclass](README.md#refactoring-day-17--extract-superclass)
 
 ---
 
@@ -1151,7 +1152,47 @@ public class RemoteControl
 }
 ```
 
+## Refactoring Day 17 : Extract Superclass
 
+This refactoring is used quite often when you have a number of methods that you want to “pull up” into a base class to allow other classes in the same hierarchy to use.
+
+Before refactoring:
+
+```C#
+public class Dog
+{
+    public void EatFood()
+    {
+        // eat some food
+    }
+   
+    public void Groom()
+    {
+        // perform grooming
+    }
+}
+```
+
+After applying the refactoring we just move the required methods into a new base class. This is very similar to the [pull up refactoring], except that you would apply this refactoring when a base class doesn’t already exist.
+
+```C#
+public class Animal
+{
+    public void EatFood()
+    {
+        // eat some food
+    }
+   
+    public void Groom()
+    {
+        // perform grooming
+    }
+}
+
+public class Dog : Animal
+{
+}
+```
 
 
 
