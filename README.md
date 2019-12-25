@@ -22,6 +22,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 17 : Extract Superclass](README.md#refactoring-day-17--extract-superclass)
 - [Refactoring Day 18 : Replace exception with conditional](README.md#refactoring-day-18--replace-exception-with-conditional)
 - [Refactoring Day 19 : Extract Factory Class](README.md#refactoring-day-19--extract-factory-class)
+- [Refactoring Day 20 : Extract Subclass](README.md#refactoring-day-20--extract-subclass)
 
 ---
 
@@ -1294,6 +1295,42 @@ public class PoliceCarController
 ```
 
 Now that we have the creation logic put off to a factory, we can add to that one class that is tasked with creating instances for us without the worry of missing something during setup or duplicating code.
+
+## Refactoring Day 20 : Extract Subclass
+
+_This refactoring is useful when you have methods on a base class that are not shared amongst all classes and needs to be pushed down into it’s own class._
+
+```C#
+public class Registration
+{
+    public NonRegistrationAction Action { get; set; }
+    public decimal RegistrationTotal { get; set; }
+    public string Notes { get; set; }
+    public string Description { get; set; }
+    public DateTime RegistrationDate { get; set; }
+}
+```
+
+There is something that we’ve realized after working with this class. We are using it in two different contexts.
+
+The properties NonRegistrationAction and Notes are only ever used when dealing with a NonRegistration which is used to track a portion of the system that is slightly different than a normal registration.
+
+Noticing this, we can extract a subclass and move those properties down into the NonRegistration class where they more appropriately fit.
+
+```C#
+public class Registration
+{
+    public decimal RegistrationTotal { get; set; }
+    public string Description { get; set; }
+    public DateTime RegistrationDate { get; set; }
+}
+
+public class NonRegistration : Registration
+{
+    public NonRegistrationAction Action { get; set; }
+    public string Notes { get; set; }
+}
+```
 
 
 
