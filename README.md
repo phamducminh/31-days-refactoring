@@ -20,6 +20,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 15 : Remove Duplication](README.md#refactoring-day-15--remove-duplication)
 - [Refactoring Day 16 : Encapsulate Conditional](README.md#refactoring-day-16--encapsulate-conditional)
 - [Refactoring Day 17 : Extract Superclass](README.md#refactoring-day-17--extract-superclass)
+- [Refactoring Day 18 : Replace exception with conditional](README.md#refactoring-day-18--replace-exception-with-conditional)
 
 ---
 
@@ -1194,6 +1195,51 @@ public class Dog : Animal
 }
 ```
 
+## Refactoring Day 18 : Replace exception with conditional
+
+A common code smell that I come across from time to time is using exceptions to control program flow. You may see something to this effect:
+
+```C#
+public class Microwave
+{
+    private IMicrowaveMotor Motor { get; set;}
+   
+    public bool Start(object food)
+    {
+        bool foodCooked = false;
+        try
+        {
+            Motor.Cook(food);
+            foodCooked = true;
+        }
+        catch(InUseException)
+        {
+            foodcooked = false;
+        }    
+    }
+    
+    return foodCooked;
+}
+```
+
+Most of the time you can replace this type of code with a proper conditional and handle it properly.
+
+```C#
+public class Microwave
+{
+    private IMicrowaveMotor Motor { get; set; }
+
+    public bool Start(object food)
+    {
+        if (Motor.IsInUse)
+            return false;
+
+        Motor.Cook(food);
+    
+        return true;
+    }
+}
+```
 
 
 
