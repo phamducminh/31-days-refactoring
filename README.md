@@ -18,6 +18,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 13 : Extract Method Object](README.md#refactoring-day-13--extract-method-object)
 - [Refactoring Day 14 : Break Responsibilities](README.md#refactoring-day-14--break-responsibilities)
 - [Refactoring Day 15 : Remove Duplication](README.md#refactoring-day-15--remove-duplication)
+- [Refactoring Day 16 : Encapsulate Conditional](README.md#refactoring-day-16--encapsulate-conditional)
 
 ---
 
@@ -1099,6 +1100,53 @@ public class MedicalRecord
     {
         Archived = true;
         DateArchived = DateTime.Now;s
+    }
+}
+```
+
+## Refactoring Day 16 : Encapsulate Conditional
+
+Sometimes when doing a number of different checks within a conditional the intent of what you are testing for gets lost in the conditional.
+
+```C#
+public class RemoteControl
+{
+    private string[] Functions { get; set; }
+    private string Name { get; set; }
+    private int CreatedYear { get; set; }
+   
+    public string PerformCoolFunction(string buttonPressed)
+    {
+        // Determine if we are controlling some extra function
+        // that requires special conditions
+        if (Functions.Length > 1 && Name == "RCA" &&
+                                CreatedYear > DateTime.Now.Year - 2)
+            return "doSomething";
+    }
+}
+```
+
+After we apply the refactoring, you can see the code reads much easier and conveys intent:
+
+```C#
+public class RemoteControl
+{
+    private string[] Functions { get; set; }
+    private string Name { get; set; }
+    private int CreatedYear { get; set; }
+   
+    private bool HasExtraFunctions
+    {
+        get { return Functions.Length > 1 && Name == "RCA" &&
+                                CreatedYear > DateTime.Now.Year - 2; }
+    }
+
+    public string PerformCoolFunction(string buttonPressed)
+    {
+        // Determine if we are controlling some extra function
+        // that requires special conditions
+        if (HasExtraFunctions)
+            return "doSomething";
     }
 }
 ```
