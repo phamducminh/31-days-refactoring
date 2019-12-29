@@ -26,6 +26,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 21 : Collapse Hierarchy](README.md#refactoring-day-21--collapse-hierarchy)
 - [Refactoring Day 22 : Break Method](README.md#refactoring-day-22-break-method)
 - [Refactoring Day 23 : Introduce Parameter Object](README.md#refactoring-day-23--introduce-parameter-object)
+- [Refactoring Day 24 : Remove Arrowhead Antipattern](README.md#refactoring-day-24--remove-arrowhead-antipattern)
 
 ---
 
@@ -1521,3 +1522,67 @@ public class Registration
     }
 }
 ```
+
+## Refactoring Day 24 : Remove Arrowhead Antipattern
+
+> The arrowhead antipattern is when you have nested conditionals so deep that they form an arrowhead of code.
+
+```C#
+public class Security
+{
+    public ISecurityChecker SecurityChecker { get; set; }
+   
+    public Security(ISecurityChecker securityChecker)
+    {
+        SecurityChecker = securityChecker;
+    }
+    
+    public bool HasAccess(User user, Permission permission,
+                                IEnumerable<Permission> exemptions)
+    {
+        bool hasPermission = false;
+        if (user != null)
+        {
+            if (permission != null)
+            {
+                if (exemptions.Count() == 0)
+                {
+                    if (SecurityChecker.CheckPermission(user, permission) ||
+                                         exemptions.Contains(permission))
+                    {
+                        hasPermission = true;
+                    } 
+                }
+            }
+        }
+    
+        return hasPermission;
+    }
+}
+```
+
+Refactoring away from the arrowhead antipattern is as simple as swapping the conditionals to leave the method as soon as possible. Refactoring in this manner often starts to look like Design By Contract checks to evaluate conditions before performing the work of the method. Here is what this same method might look like after refactoring.
+
+```C#
+public class Security
+{
+    public ISecurityChecker SecurityChecker { get; set; }
+   
+    public Security(ISecurityChecker securityChecker)
+    {
+        SecurityChecker = securityChecker;
+    }
+   
+    public bool HasAccess(User user, Permission permission,
+                                IEnumerable<Permission> exemptions)
+    {
+        if (user == null || permission == null)
+            return false;
+        if (exemptions.Contains(permission))
+            return true;
+        return SecurityChecker.CheckPermission(user, permission);
+    }
+}
+```
+
+As you can see, this method is much more readable and maintainable going forward. It’s not as difficult to see all the different paths you can take through this method.
