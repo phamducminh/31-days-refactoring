@@ -25,6 +25,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 20 : Extract Subclass](README.md#refactoring-day-20--extract-subclass)
 - [Refactoring Day 21 : Collapse Hierarchy](README.md#refactoring-day-21--collapse-hierarchy)
 - [Refactoring Day 22 : Break Method](README.md#refactoring-day-22-break-method)
+- [Refactoring Day 23 : Introduce Parameter Object](README.md#refactoring-day-23--introduce-parameter-object)
 
 ---
 
@@ -1485,4 +1486,38 @@ public class Product
 }   
 ```
 
+## Refactoring Day 23 : Introduce Parameter Object
 
+Sometimes when working with a method that needs several parameters it becomes difficult to read the
+method signature because of five or more parameters being passed to the method like so:
+
+```C#
+public class Registration
+{
+    public void Create(decimal amount, Student student,
+                         IEnumerable<Course> courses, decimal credits)
+    {
+        // do work
+    }
+}
+```
+
+It’s useful to create a class who’s only responsibility is to carry parameters into the method. This helps make the code more flexible because to add more parameters, you need only to add another field to the parameter object.
+
+```C#
+public class RegistrationContext
+{
+    public decimal Amount { get; set; }
+    public Student Student { get; set; }
+    public IEnumerable<Course> Courses { get; set; }
+    public decimal Credits { get; set; }
+}
+
+public class Registration
+{
+    public void Create(RegistrationContext registrationContext)
+    {
+        // do work
+    }
+}
+```
