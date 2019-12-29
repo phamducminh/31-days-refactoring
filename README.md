@@ -27,6 +27,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 22 : Break Method](README.md#refactoring-day-22-break-method)
 - [Refactoring Day 23 : Introduce Parameter Object](README.md#refactoring-day-23--introduce-parameter-object)
 - [Refactoring Day 24 : Remove Arrowhead Antipattern](README.md#refactoring-day-24--remove-arrowhead-antipattern)
+- [Refactoring Day 25 : Introduce Design By Contract checks](README.md#refactoring-day-25--introduce-design-by-contract-checks)
 
 ---
 
@@ -1586,3 +1587,48 @@ public class Security
 ```
 
 As you can see, this method is much more readable and maintainable going forward. It’s not as difficult to see all the different paths you can take through this method.
+
+## Refactoring Day 25 : Introduce Design By Contract checks
+
+**Design By Contract or DBC defines that methods should have defined input and output verifications.**
+
+In our example here, we are working with input parameters that may possibly be null. As a result a NullReferenceException would be thrown from this method because we never verify that we have an instance. During the end of the method, we don’t ensure that we are returning a valid decimal to the consumer of this method and may introduce methods elsewhere.
+
+```C#
+public class CashRegister
+{
+    public decimal TotalOrder(IEnumerable<Product> products, Customer customer)
+    {
+        decimal orderTotal = products.Sum(product => product.Price);
+
+        customer.Balance += orderTotal;
+
+        return orderTotal;
+    }
+}
+```
+
+The changes we can make here to introduce DBC checks is pretty easy. First we will assert that we don’t have a null customer, check that we have at least one product to total. Before we return the order total we will ensure that we have a valid amount for the order total. If any of these checks fail in this example we should throw targeted exceptions that detail exactly what happened and fail gracefully rather than throw an obscure NullReferenceException.
+
+```C#
+public class CashRegister
+{
+    public decimal TotalOrder(IEnumerable<Product> products, Customer customer)
+    {
+        if (customer == null)
+            throw new ArgumentNullException("customer", "Customer cannot be null");
+        if (product.Count() == 0)
+            throw new ArgumentException("Must have at least one product to total",
+                                     "products");
+        decimal orderTotal = products.Sum(product => product.Price);
+        
+        customer.Balance += orderTotal;
+        
+        if (orderTotal == 0)
+            throw new ArgumentOutOfRangeException("orderTotal",
+                                            "Order Total should not be zero");
+        return orderTotal;
+}
+```
+
+It does add more code to the method for validation checks and you can go overboard with DBC, but I think in most scenarios it is a worthwhile endeavor to catch sticky situations. It really stinks to chase after a NullReferenceException without detailed information.
