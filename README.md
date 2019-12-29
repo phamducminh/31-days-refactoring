@@ -28,6 +28,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 23 : Introduce Parameter Object](README.md#refactoring-day-23--introduce-parameter-object)
 - [Refactoring Day 24 : Remove Arrowhead Antipattern](README.md#refactoring-day-24--remove-arrowhead-antipattern)
 - [Refactoring Day 25 : Introduce Design By Contract checks](README.md#refactoring-day-25--introduce-design-by-contract-checks)
+- [Refactoring Day 26 : Remove Double Negative](README.md#refactoring-day26--remove-double-negative)
 
 ---
 
@@ -1632,3 +1633,64 @@ public class CashRegister
 ```
 
 It does add more code to the method for validation checks and you can go overboard with DBC, but I think in most scenarios it is a worthwhile endeavor to catch sticky situations. It really stinks to chase after a NullReferenceException without detailed information.
+
+## Refactoring Day 26 : Remove Double Negative
+
+> This type of code does the most damage because of the assumptions made on it. Assumptions lead to incorrect maintenance code written, which in turn leads to bugs
+
+```C#
+public class Order
+{
+    public void Checkout(IEnumerable<Product> products, Customer customer)
+    {
+        if (!customer.IsNotFlagged)
+        {
+            // the customer account is flagged
+            // log some errors and return
+            return;
+        }
+
+        // normal order processing
+    }    
+}
+
+public class Customer
+{
+    public decimal Balance { get; private set; }
+
+    public bool IsNotFlagged
+    {
+        get { return Balance < 30m; }
+    }
+    
+}
+```
+
+As you can see the double negative here is difficult to read because we have to figure out what is positive state of the two negatives. The fix is very easy. If we don’t have a positive test, add one that does the double negative assertion for you rather than make sure you get it correct.
+
+```C#
+public class Order
+{
+    public void Checkout(IEnumerable<Product> products, Customer customer)
+    {
+        if (customer.IsFlagged)
+        {
+            // the customer account is flagged
+            // log some errors and return
+            return;
+        }
+
+        // normal order processing
+    }
+}
+
+public class Customer
+{
+    public decimal Balance { get; private set; }
+
+    public bool IsFlagged
+    {
+        get { return Balance >= 30m; }
+    }
+}
+```
