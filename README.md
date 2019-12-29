@@ -24,6 +24,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 19 : Extract Factory Class](README.md#refactoring-day-19--extract-factory-class)
 - [Refactoring Day 20 : Extract Subclass](README.md#refactoring-day-20--extract-subclass)
 - [Refactoring Day 21 : Collapse Hierarchy](README.md#refactoring-day-21--collapse-hierarchy)
+- [Refactoring Day 22 : Break Method](README.md#refactoring-day-22-break-method)
 
 ---
 
@@ -1362,4 +1363,126 @@ public class Website
     public bool IsActive { get; set; }
 }
 ```
+
+## Refactoring Day 22 : Break Method
+
+> This refactoring is kind of a meta-refactoring in the fact that it’s just extract method applied over and over until you decompose one large method into several smaller methods.
+
+Below we have the AcceptPayment method that can be decomposed multiple times into distinct methods.
+
+```C#
+public class CashRegister
+{
+    public CashRegister()
+    {
+        Tax = 0.06m;
+    }
+   
+    private decimal Tax { get; set; }
+   
+    public void AcceptPayment(Customer customer, IEnumerable<Product> products,
+                                           decimal payment)
+    {
+        decimal subTotal = 0m;
+        foreach (Product product in products)
+        {
+            subTotal += product.Price;
+        }
+
+        foreach(Product product in products)
+        {
+            subTotal -= product.AvailableDiscounts;
+        }
+  
+        decimal grandTotal = subTotal * Tax;
+  
+        customer.DeductFromAccountBalance(grandTotal);
+    }
+}
+
+public class Customer
+{
+    public void DeductFromAccountBalance(decimal amount)
+    {
+        // deduct from balance
+    }
+}
+
+public class Product
+{
+    public decimal Price { get; set; }
+    public decimal AvailableDiscounts { get; set; }
+}
+```
+
+As you can see the AcceptPayment method has a couple of things that can be decomposed into targeted methods. So we perform the Extract Method refactoring a number of times until we come up with the result:
+
+```C#
+public class CashRegister
+{
+    public CashRegister()
+    {
+        Tax = 0.06m;
+    }
+
+    private decimal Tax { get; set; }
+    private IEnumerable<Product> Products { get; set; }
+
+    public void AcceptPayment(Customer customer, IEnumerable<Product> products,
+                                        decimal payment)
+    {
+        decimal subTotal = CalculateSubtotal();
+
+        subTotal = SubtractDiscounts(subTotal);
+
+        decimal grandTotal = AddTax(subTotal);
+
+        SubtractFromCustomerBalance(customer, grandTotal);
+    }
+
+    private void SubtractFromCustomerBalance(Customer customer, decimal grandTotal)
+    {
+        customer.DeductFromAccountBalance(grandTotal);
+    }
+
+    private decimal AddTax(decimal subTotal)
+    {
+        return subTotal * Tax;
+    }
+
+    private decimal SubtractDiscounts(decimal subTotal)
+    {
+        foreach(Product product in Products)
+        {
+            subTotal -= product.AvailableDiscounts;
+        }
+        return subTotal;
+    }
+
+    private decimal CalculateSubtotal()
+    {
+        decimal subTotal = 0m;
+        foreach (Product product in Products)
+        {
+            subTotal += product.Price;
+        }
+        return subTotal;
+    }
+}
+
+public class Customer
+{
+    public void DeductFromAccountBalance(decimal amount)
+    {
+        // deduct from balance
+    }
+}
+
+public class Product
+{
+    public decimal Price { get; set; }
+    public decimal AvailableDiscounts { get; set; }
+}   
+```
+
 
