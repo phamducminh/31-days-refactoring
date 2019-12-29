@@ -23,6 +23,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 18 : Replace exception with conditional](README.md#refactoring-day-18--replace-exception-with-conditional)
 - [Refactoring Day 19 : Extract Factory Class](README.md#refactoring-day-19--extract-factory-class)
 - [Refactoring Day 20 : Extract Subclass](README.md#refactoring-day-20--extract-subclass)
+- [Refactoring Day 21 : Collapse Hierarchy](README.md#refactoring-day-21--collapse-hierarchy)
 
 ---
 
@@ -1332,5 +1333,33 @@ public class NonRegistration : Registration
 }
 ```
 
+## Refactoring Day 21 : Collapse Hierarchy
 
+A Collapse Hierarchy refactoring would be applied when you realize you no longer need a subclass. When this happens it doesn’t really make sense to keep your subclass around if it’s properties can be merged into the base class and used strictly from there.
+
+```C#
+public class Website
+{
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public IEnumerable<Webpage> Pages { get; set; }
+}
+
+public class StudentWebsite : Website
+{
+    public bool IsActive { get; set; }
+}
+```
+
+Here we have a subclass that isn’t doing too much. It just has one property to denote if the site is active or not. At this point maybe we realize that determing if a site is active is something we can use across the board so we can collapse the hierarchy back into only a Website and eliminate the StudentWebsite type.
+
+```C#
+public class Website
+{
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public IEnumerable<Webpage> Pages { get; set; }
+    public bool IsActive { get; set; }
+}
+```
 
