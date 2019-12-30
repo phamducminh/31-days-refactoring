@@ -30,6 +30,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 25 : Introduce Design By Contract checks](README.md#refactoring-day-25--introduce-design-by-contract-checks)
 - [Refactoring Day 26 : Remove Double Negative](README.md#refactoring-day26--remove-double-negative)
 - [Refactoring Day 27 : Remove God Classes](README.md#refactoring-day27--remove-god-classes)
+- [Refactoring Day 28 : Rename boolean method](README.md#refactoring-day-28--rename-boolean-method)
 
 ---
 
@@ -1765,6 +1766,44 @@ public class CustomerRegistrationService
     }
 
     public void ForgotPassword(Customer customer)
+    {
+        // do work
+    }
+}
+```
+
+## Refactoring Day 28 : Rename boolean method
+
+> Methods with a large number of boolean parameters can quickly get out of hand and can produce unexpected behavior. Depending on the number of parameters will determine how many methods need to be broken out.
+
+```C#
+public class BankAccount
+{
+    public void CreateAccount(Customer customer, bool withChecking,
+                    bool withSavings, bool withStocks)
+    {
+        // do work
+    }
+}
+```
+
+We can make this work a little better simple by exposing the boolean parameters via well named methods and in turn make the original method private to prevent anyone from calling it going forward. Obviously you could have a large number of permutations here and perhaps it makes more sense to refactor to a Parameter object instead.
+
+```C#
+public class BankAccount
+{
+    public void CreateAccountWithChecking(Customer customer)
+    {
+        CreateAccount(customer, true, false);
+    }
+   
+    public void CreateAccountWithCheckingAndSavings(Customer customer)
+    {
+        CreateAccount(customer, true, true);
+    }
+    
+    private void CreateAccount(Customer customer, bool withChecking,
+                            bool withSavings)
     {
         // do work
     }
