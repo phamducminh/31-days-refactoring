@@ -11,8 +11,8 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 6 : Push Down Field](README.md#refactoring-day-6--push-down-field)
 - [Refactoring Day 7 : Rename (method, class, parameter)](README.md#refactoring-day-7--rename-method-class-parameter)
 - [Refactoring Day 8 : Replace Inheritance with Delegation](README.md#refactoring-day-8--replace-inheritance-with-delegation)
-- [Refactoring Day 9 : Extract Interface](README.md#refactoring-day-9--extract-interface)
-- [Refactoring Day 10 : Extract Method](README.md#rsefactoring-day-10--extract-method)
+- [Refactoring Day 9 : Extract Interfaces](README.md#refactoring-day-9--extract-interfaces)
+- [Refactoring Day 10 : Extract Method](README.md#refactoring-day-10--extract-method)
 - [Refactoring Day 11 : Switch to Strategy](README.md#refactoring-day-11--switch-to-strategy)
 - [Refactoring Day 12 : Break Dependencies](README.md#refactoring-day-12--break-dependencies)
 - [Refactoring Day 13 : Extract Method Object](README.md#refactoring-day-13--extract-method-object)
@@ -24,12 +24,12 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 19 : Extract Factory Class](README.md#refactoring-day-19--extract-factory-class)
 - [Refactoring Day 20 : Extract Subclass](README.md#refactoring-day-20--extract-subclass)
 - [Refactoring Day 21 : Collapse Hierarchy](README.md#refactoring-day-21--collapse-hierarchy)
-- [Refactoring Day 22 : Break Method](README.md#refactoring-day-22-break-method)
+- [Refactoring Day 22 : Break Method](README.md#refactoring-day-22--break-method)
 - [Refactoring Day 23 : Introduce Parameter Object](README.md#refactoring-day-23--introduce-parameter-object)
 - [Refactoring Day 24 : Remove Arrowhead Antipattern](README.md#refactoring-day-24--remove-arrowhead-antipattern)
 - [Refactoring Day 25 : Introduce Design By Contract checks](README.md#refactoring-day-25--introduce-design-by-contract-checks)
-- [Refactoring Day 26 : Remove Double Negative](README.md#refactoring-day26--remove-double-negative)
-- [Refactoring Day 27 : Remove God Classes](README.md#refactoring-day27--remove-god-classes)
+- [Refactoring Day 26 : Remove Double Negative](README.md#refactoring-day-26--remove-double-negative)
+- [Refactoring Day 27 : Remove God Classes](README.md#refactoring-day-27--remove-god-classes)
 - [Refactoring Day 28 : Rename boolean method](README.md#refactoring-day-28--rename-boolean-method)
 
 ---
@@ -1809,3 +1809,5 @@ public class BankAccount
     }
 }
 ```
+
+
