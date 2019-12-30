@@ -29,6 +29,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 24 : Remove Arrowhead Antipattern](README.md#refactoring-day-24--remove-arrowhead-antipattern)
 - [Refactoring Day 25 : Introduce Design By Contract checks](README.md#refactoring-day-25--introduce-design-by-contract-checks)
 - [Refactoring Day 26 : Remove Double Negative](README.md#refactoring-day26--remove-double-negative)
+- [Refactoring Day 27 : Remove God Classes](README.md#refactoring-day27--remove-god-classes)
 
 ---
 
@@ -1691,6 +1692,81 @@ public class Customer
     public bool IsFlagged
     {
         get { return Balance >= 30m; }
+    }
+}
+```
+
+## Refactoring Day 27 : Remove God Classes
+
+* Often these classes will be suffixed with either `“Utils”` or `“Manager”`
+* Classes with multiple grouped pieces of functionality
+* Another good indicator of a God class is methods grouped together with using statements or comments into seperate roles that this one class is performing.
+
+```C#
+public class CustomerService
+{
+    public decimal CalculateOrderDiscount(IEnumerable<Product> products,
+                                            Customer customer)
+    {
+        // do work
+    }
+   
+    public bool CustomerIsValid(Customer customer, Order order)
+    {
+        // do work
+    }
+
+    public IEnumerable<string> GatherOrderErrors(IEnumerable<Product> products,
+                                            Customer customer)
+    {
+        // do work
+    }
+
+    public void Register(Customer customer)
+    {
+        // do work
+    }
+
+    public void ForgotPassword(Customer customer)
+    {
+        // do work
+    }
+}
+```
+
+**The refactoring for this is very straight forward. Simply take the related methods and place them in specific classes that match their responsibility. This makes them much finer grained and defined in what they do and make future maintenance much easier.**
+
+```C#
+public class CustomerOrderService
+{
+    public decimal CalculateOrderDiscount(IEnumerable<Product> products,
+                                            Customer customer)
+    {
+        // do work
+    }
+   
+    public bool CustomerIsValid(Customer customer, Order order)
+    {
+        // do work
+    }
+
+    public IEnumerable<string> GatherOrderErrors(IEnumerable<Product> products,
+                                            Customer customer)
+    {
+        // do work
+    }
+}
+
+public class CustomerRegistrationService
+{
+    public void Register(Customer customer)
+    {
+        // do work
+    }
+
+    public void ForgotPassword(Customer customer)
+    {
+        // do work
     }
 }
 ```
