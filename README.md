@@ -31,6 +31,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 26 : Remove Double Negative](README.md#refactoring-day-26--remove-double-negative)
 - [Refactoring Day 27 : Remove God Classes](README.md#refactoring-day-27--remove-god-classes)
 - [Refactoring Day 28 : Rename boolean method](README.md#refactoring-day-28--rename-boolean-method)
+- [Refactoring Day 29 : Remove Middle Man](README.md#refactoring-day-29--remove-middle-man)
 
 ---
 
@@ -1809,5 +1810,80 @@ public class BankAccount
     }
 }
 ```
+
+## Refactoring Day 29 : Remove Middle Man
+
+Sometimes in code you may have a set of “Phantom” or “Ghost” classes. Fowler calls these “Middle Men”. Middle Men classes simply take calls and forward them on to other components without doing any work. This is an unneeded layer and can be removed completely with minimal effort.
+
+```C#
+public class Consumer
+{
+    public AccountManager AccountManager { get; set; }
+   
+    public Consumer(AccountManager accountManager)
+    {
+        AccountManager = accountManager;
+    }
+   
+    public void Get(int id)
+    {
+        Account account = AccountManager.GetAccount(id);
+    }
+}
+
+public class AccountManager
+{
+    public AccountDataProvider DataProvider { get; set; }
+  
+    public AccountManager(AccountDataProvider dataProvider)
+    {
+        DataProvider = dataProvider;
+    }
+
+    public Account GetAccount(int id)
+    {
+        return DataProvider.GetAccount(id);
+    }
+}
+
+public class AccountDataProvider
+{
+    public Account GetAccount(int id)
+    {
+        // get account
+    }
+}
+```
+
+The end result is straightforward enough. We just remove the middle man object and point the original call to the intended receiver.
+
+```C#
+public class Consumer
+{
+    public AccountDataProvider AccountDataProvider { get; set; }
+   
+    public Consumer(AccountDataProvider dataProvider)
+    {
+        AccountDataProvider = dataProvider;
+    }
+   
+    public void Get(int id)
+    {
+        Account account = AccountDataProvider.GetAccount(id);
+    }
+}
+
+public class AccountDataProvider
+{
+    public Account GetAccount(int id)
+    {
+        // get account
+    }
+}
+```
+
+
+
+
 
 
