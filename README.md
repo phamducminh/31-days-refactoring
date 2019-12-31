@@ -32,6 +32,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 27 : Remove God Classes](README.md#refactoring-day-27--remove-god-classes)
 - [Refactoring Day 28 : Rename boolean method](README.md#refactoring-day-28--rename-boolean-method)
 - [Refactoring Day 29 : Remove Middle Man](README.md#refactoring-day-29--remove-middle-man)
+- [Refactoring Day 30 : Return ASAP](README.md#refactoring-day-30--return-asap)
 
 ---
 
@@ -1882,6 +1883,60 @@ public class AccountDataProvider
 }
 ```
 
+## Refactoring Day 30 : Return ASAP
+
+The refactoring introduces this as a side effect to remove the arrowhead. To eliminate the arrowhead you return as soon as possible.
+
+```C#
+public class Order
+{
+    public Customer Customer { get; private set; }
+   
+    public decimal CalculateOrder(Customer customer, IEnumerable<Product> products,
+                                    decimal discounts)
+    {
+        Customer = customer;
+        decimal orderTotal = 0m;
+    
+        if (products.Count() > 0)
+        {
+            orderTotal = products.Sum(p => p.Price);
+            if (discounts > 0)
+            {
+                orderTotal -= discounts;
+            }
+        }
+
+        return orderTotal;    
+    }
+}
+```
+
+The idea is that as soon as you know what needs to be done and you have all the required information, you should exit the method as soon as possible and not continue along.
+
+```C#
+public class Order
+{
+    public Customer Customer { get; private set; }
+   
+    public decimal CalculateOrder(Customer customer, IEnumerable<Product> products,
+                                    decimal discounts)
+    {
+        if (products.Count() == 0)
+            return 0;
+
+        Customer = customer;
+        decimal orderTotal = products.Sum(p => p.Price);
+
+        if (discounts == 0)
+            return orderTotal;
+  
+        orderTotal -= discounts;
+  
+        return orderTotal;
+    }
+}
+```
 
 
 
