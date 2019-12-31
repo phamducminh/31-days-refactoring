@@ -33,7 +33,7 @@ This will keep reminding me refactoring my silly code
 - [Refactoring Day 28 : Rename boolean method](README.md#refactoring-day-28--rename-boolean-method)
 - [Refactoring Day 29 : Remove Middle Man](README.md#refactoring-day-29--remove-middle-man)
 - [Refactoring Day 30 : Return ASAP](README.md#refactoring-day-30--return-asap)
-
+- [Refactoring Day 31 : Replace conditional with Polymorphism](README.md#refactoring-day-31--replace-conditional-with-polymorphism)
 ---
 
 ## Refactoring Day 1 : Encapsulate Collection
@@ -1938,7 +1938,82 @@ public class Order
 }
 ```
 
+## Refactoring Day 31 : Replace conditional with Polymorphism
 
+**The concept here is that in instances where you are doing checks by type, and performing some type of operation, it’s a good idea to encapsulate that algorithm within the class and then use polymorphism to abstract the call to the code.**
+
+```C#
+public abstract class Customer
+{
+}
+
+public class Employee : Customer
+{
+}
+
+public class NonEmployee : Customer
+{
+}
+
+public class OrderProcessor
+{
+    public decimal ProcessOrder(Customer customer, IEnumerable<Product> products)
+    {
+        // do some processing of order
+        decimal orderTotal = products.Sum(p => p.Price);
+
+        Type customerType = customer.GetType();
+        if (customerType == typeof(Employee))
+        {
+            orderTotal -= orderTotal * 0.15m;
+        }
+        else if (customerType == typeof(NonEmployee))
+        {
+            orderTotal -= orderTotal * 0.05m;
+        }
+
+        return orderTotal;
+    }
+}
+```
+
+As you can see here, we’re not leaning on our inheritance hierarchy to put the calculation, or even the data needed to perform the calculation lest we have a SRP violation. So to refactor this we simply take the percentage rate and place that on the actual customer type that each class will then implement.
+
+```C#
+public abstract class Customer
+{
+    public abstract decimal DiscountPercentage { get; }
+}
+
+public class Employee : Customer
+{
+    public override decimal DiscountPercentage
+    {
+        get { return 0.15m; }
+    }
+}
+
+public class NonEmployee : Customer
+{
+    public override decimal DiscountPercentage
+    {
+        get { return 0.05m; }
+    }
+}
+
+public class OrderProcessor
+{
+    public decimal ProcessOrder(Customer customer, IEnumerable<Product> products)
+    {
+        // do some processing of order
+        decimal orderTotal = products.Sum(p => p.Price);
+
+        orderTotal -= orderTotal * customer.DiscountPercentage;
+
+        return orderTotal;
+    }
+}
+```
 
 
 
